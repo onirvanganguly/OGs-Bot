@@ -160,6 +160,7 @@ client.on('guildMemberAdd', async (member) => {
 
   try {
 
+    // AUTO ROLE
     const role = member.guild.roles.cache.find(
       r => r.name === AUTO_ROLE_NAME
     );
@@ -168,20 +169,49 @@ client.on('guildMemberAdd', async (member) => {
       await member.roles.add(role);
     }
 
-  } catch {}
+  } catch (err) {
 
+    console.log(err);
+
+  }
+
+  // WELCOME CHANNEL
   const channel = member.guild.channels.cache.find(
     c => c.name === WELCOME_CHANNEL_NAME
   );
 
   if (!channel) return;
 
+  // WELCOME EMBED
   const embed = new EmbedBuilder()
-    .setTitle(`👋 Welcome to ${member.guild.name}!`)
-    .setDescription(`Hey ${member}, welcome to the chaos 😭`)
+    .setAuthor({
+      name: 'OGs eSports',
+      iconURL: member.guild.iconURL({ dynamic: true })
+    })
+
+    .setTitle('Welcome!')
+
+    .setDescription(
+`✧ Welcome to the Epicness ${member} !
+
+✧ You Are Our ${member.guild.memberCount}th Member!
+
+✧ Chat & Make Friends In <#732282717831430254>
+
+✧ Read Rules Carefully In <#732281800092811376> And Follow Them!
+
+✧ Play Games & Have Fun With Your Friends!`
+    )
+
+    .setThumbnail(
+      member.user.displayAvatarURL({ dynamic: true, size: 1024 })
+    )
+
     .setColor(0x5865F2);
 
-  channel.send({ embeds: [embed] });
+  channel.send({
+    embeds: [embed]
+  });
 
 });
 
