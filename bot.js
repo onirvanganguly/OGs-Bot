@@ -5,7 +5,12 @@
 const {
   Client,
   GatewayIntentBits,
-  EmbedBuilder
+  EmbedBuilder,
+  ActionRowBuilder,
+  ButtonBuilder,
+  ButtonStyle,
+  PermissionsBitField,
+  ChannelType
 } = require('discord.js');
 
 const axios = require('axios');
@@ -84,51 +89,7 @@ const roasts = [
   "you’re not useless, you’re just limited edition",
   "even NPCs have better decision making",
   "you don’t lose, you donate wins 😭",
-  "your aim is just vibes at this point",
-  "you’re the reason tutorials exist",
-  "if bad plays were currency, you’d be rich",
-  "you play like your monitor is off",
-  "even bots report you",
-  "you bring negative value to the team",
-  "your gamesense left the chat",
-  "you peek like you have a death wish",
-  "bro installs confidence instead of skill",
-  "you’re not clutch, you’re chaotic",
-  "you aim like you're allergic to enemies",
-  "you move like a tutorial glitch",
-  "you’re the plot twist no one wanted",
-  "you don’t carry, you get carried emotionally",
-  "you make bad decisions look creative",
-  "you’re consistent at being inconsistent",
-  "you got the confidence of a pro and aim of a potato",
-  "your minimap awareness is fictional",
-  "you think before you act and still choose wrong",
-  "you play like you’re lagging in real life",
-  "you don’t choke, you pre-choke",
-  "you’re not trolling, you’re naturally like this",
-  "you’re the reason teammates mute themselves",
-  "your strategy is just hope",
-  "you reload at the worst possible time every time",
-  "you don’t miss, you avoid",
-  "you got spectator energy",
-  "you’re built like a disconnect",
-  "you play like patch notes didn’t reach you",
-  "you got zero map control and full confidence",
-  "you don’t rotate, you disappear",
-  "you’re the warm-up for enemy team",
-  "you aim like it’s a suggestion",
-  "you play like your keyboard is optional",
-  "you got main character energy with side character impact",
-  "you don’t throw games, you gift them",
-  "you peek once and never emotionally recover",
-  "you got talent, just not here",
-  "you’re the definition of unlucky according to yourself",
-  "you don’t learn from mistakes, you repeat them",
-  "you’re not bad, you’re misunderstood by skill",
-  "you bring chaos but not value",
-  "you got aim assist, it assists the enemy",
-  "you’re the practice mode for opponents",
-  "you got more excuses than kills"
+  "your aim is just vibes at this point"
 ];
 
 // ============================================================
@@ -142,7 +103,6 @@ client.once('ready', () => {
 
   client.user.setActivity('watching the chaos 😭');
 
-  // AUTO BUMP REMINDER
   setInterval(() => {
 
     client.guilds.cache.forEach(guild => {
@@ -195,30 +155,29 @@ client.on('guildMemberAdd', async (member) => {
 });
 
 // ============================================================
-// MAIN MESSAGE EVENT
-// ============================================================
-// ============================================================
 // PASSIVE CHAT SYSTEM
 // ============================================================
 
 let lastPassiveReply = 0;
 
-const PASSIVE_COOLDOWN = 5000; // 5 sec
+const PASSIVE_COOLDOWN = 5000;
+
+// ============================================================
+// MAIN MESSAGE EVENT
+// ============================================================
+
 client.on('messageCreate', async (message) => {
 
   if (message.author.bot) return;
-  // ============================================================
-// PASSIVE REPLY CHANCE
-// ============================================================
 
-const now = Date.now();
+  const now = Date.now();
 
-const passiveAllowed =
-  now - lastPassiveReply > PASSIVE_COOLDOWN;
+  const passiveAllowed =
+    now - lastPassiveReply > PASSIVE_COOLDOWN;
 
-const shouldPassiveReply =
-  passiveAllowed &&
-  Math.random() < 0.08;
+  const shouldPassiveReply =
+    passiveAllowed &&
+    Math.random() < 0.08;
 
   const userId = message.author.id;
   const msg = message.content.toLowerCase();
@@ -247,6 +206,7 @@ const shouldPassiveReply =
     const command = args.shift().toLowerCase();
 
     // HELP
+
     if (command === 'help') {
 
       return message.reply(`
@@ -257,10 +217,12 @@ Commands:
 !stats
 !valo
 !roast
+!ticketpanel
       `);
     }
 
     // JOKE
+
     if (command === 'joke') {
 
       return message.reply(
@@ -269,6 +231,7 @@ Commands:
     }
 
     // 8BALL
+
     if (command === '8ball') {
 
       return message.reply(
@@ -279,6 +242,7 @@ Commands:
     }
 
     // STATS
+
     if (command === 'stats') {
 
       const sorted = Object.entries(stats)
@@ -296,6 +260,7 @@ Commands:
     }
 
     // ROAST
+
     if (command === 'roast') {
 
       const target = message.mentions.users.first();
@@ -304,41 +269,18 @@ Commands:
         return message.reply('Tag someone to roast 😭');
       }
 
-      // OWNER PROTECTION
       if (target.id === OWNER_ID) {
-
-        const ownerReplies = [
-          'nah 😭 that’s my creator',
-          'i cannot roast my father',
-          'bro tried roasting the admin 💀',
-          'respect the creator 😭',
-          'that man built me'
-        ];
-
-        return message.reply(
-          ownerReplies[
-            Math.floor(Math.random() * ownerReplies.length)
-          ]
-        );
-      }
-
-      if (target.id === message.author.id) {
-        return message.reply('You want me to roast yourself? Respect 💀');
-      }
-
-      if (target.id === client.user.id) {
-        return message.reply('Nice try 😏');
+        return message.reply('nah 😭 that’s my creator');
       }
 
       const roast =
         roasts[Math.floor(Math.random() * roasts.length)];
 
-      await message.channel.sendTyping();
-
       return message.reply(`${target}, ${roast}`);
     }
 
     // VALO
+
     if (command === 'valo') {
 
       const input = args[0];
@@ -352,7 +294,6 @@ Commands:
       name = name.toLowerCase();
       tag = tag.toLowerCase();
 
-      // OWNER SPECIAL VALO
       if (OWNER_VALO_NAMES.includes(name)) {
 
         return message.reply(`
@@ -360,11 +301,6 @@ Commands:
 
 Playstyle:
 best player alive 😭
-
-Analysis:
-my creator.
-my father.
-ranked fears him.
 `);
       }
 
@@ -381,8 +317,6 @@ ranked fears him.
             Math.floor(Math.random() * valoPersonalities.length)
           ];
 
-        await message.channel.sendTyping();
-
         return message.reply(`
 🎮 ${player.name}#${player.tag}
 
@@ -397,8 +331,6 @@ ${personality}
             Math.floor(Math.random() * valoFallbacks.length)
           ];
 
-        await message.channel.sendTyping();
-
         return message.reply(`
 🎮 ${name}#${tag}
 
@@ -409,509 +341,203 @@ ${fallback}
         `);
       }
     }
-  }
 
-  // ============================================================
-  // MENTION CHAT
-  // ============================================================
+    // ============================================================
+    // TICKET PANEL
+    // ============================================================
 
-  if (message.mentions.has(client.user)) {
+    if (command === 'ticketpanel') {
 
-    const userMessage = message.content
-      .replace(`<@${client.user.id}>`, '')
-      .replace(`<@!${client.user.id}>`, '')
-      .trim()
-      .toLowerCase();
+      const embed = new EmbedBuilder()
+        .setTitle('🎫 Brawlers Support')
+        .setDescription(
+          'Click the button below to create a support ticket.\n\n' +
+          '• Tournament Support\n' +
+          '• Prize Claims\n' +
+          '• Player Reports\n' +
+          '• Partnerships'
+        )
+        .setColor(0x5865F2);
 
-    // OWNER SPECIAL REPLIES
-    if (message.author.id === OWNER_ID) {
+      const row = new ActionRowBuilder()
+        .addComponents(
 
-      const ownerReplies = [
-        'yo creator 😭',
-        'my father has arrived',
-        'respectfully speaking, best player alive',
-        'hello bossman 😎',
-        'ranked demon detected'
-      ];
+          new ButtonBuilder()
+            .setCustomId('create_ticket')
+            .setLabel('Create Ticket')
+            .setEmoji('🎫')
+            .setStyle(ButtonStyle.Primary)
 
-      if (Math.random() < 0.4) {
-
-        await message.channel.sendTyping();
-
-        return message.reply(
-          ownerReplies[
-            Math.floor(Math.random() * ownerReplies.length)
-          ]
         );
-      }
+
+      return message.channel.send({
+        embeds: [embed],
+        components: [row]
+      });
     }
-
-    // MEMORY
-    if (!memory.has(userId)) {
-      memory.set(userId, {});
-    }
-
-    const userMemory = memory.get(userId);
-
-    // HINDI DETECTION
-    const hindiWords = [
-      'kya',
-      'kaise',
-      'nahi',
-      'haan',
-      'bhai',
-      'kyu',
-      'kahan',
-      'kr rhe',
-      'kheloge'
-    ];
-
-    if (
-      hindiWords.some(word => userMessage.includes(word))
-    ) {
-
-      await message.channel.sendTyping();
-
-      return message.reply(
-        'bhai hindi nahi aati 😭 english pls'
-      );
-    }
-
-    // MEMORY SYSTEM
-    if (userMessage.includes('my name is')) {
-
-      const name = userMessage
-        .split('my name is')[1]
-        .trim();
-
-      userMemory.name = name;
-
-      return message.reply(`Got it ${name} 😎`);
-    }
-
-    if (userMessage.includes("what's my name")) {
-
-      return message.reply(
-        userMemory.name || 'bro never told me 😭'
-      );
-    }
-
-    // GREETINGS
-    if (
-      userMessage.includes('hi') ||
-      userMessage.includes('hello') ||
-      userMessage.includes('yo')
-    ) {
-
-      const replies = [
-        'yo 😎',
-        'what’s good bro',
-        'alive unfortunately 😭',
-        'yo gang',
-        'bro spawned in'
-      ];
-
-      await message.channel.sendTyping();
-
-      return message.reply(
-        replies[Math.floor(Math.random() * replies.length)]
-      );
-    }
-
-    // GOOD MORNING
-    if (
-      userMessage.includes('good morning')
-    ) {
-
-      const replies = [
-        'good morning bro 😭',
-        'bro fixing sleep schedule?',
-        'morning at this cursed hour is insane',
-        'who woke bro up'
-      ];
-
-      await message.channel.sendTyping();
-
-      return message.reply(
-        replies[Math.floor(Math.random() * replies.length)]
-      );
-    }
-
-    // SAD / TIRED
-    const sadWords = [
-      'sad',
-      'depressed',
-      'lonely',
-      'hurt',
-      'crying',
-      'tired',
-      'done'
-    ];
-
-    if (
-      sadWords.some(word => userMessage.includes(word))
-    ) {
-
-      const replies = [
-        'damn 😭 wanna talk about it?',
-        'bro going through character development',
-        'ranked really destroys mental health',
-        'who hurt bro',
-        'take a break gang 😭'
-      ];
-
-      await message.channel.sendTyping();
-
-      return message.reply(
-        replies[Math.floor(Math.random() * replies.length)]
-      );
-    }
-
-    // LOVE / FRIENDSHIP
-    if (
-      userMessage.includes('i love u') ||
-      userMessage.includes('love u') ||
-      userMessage.includes('you are now my friend')
-    ) {
-
-      const replies = [
-        'bro got emotional mid queue 😭',
-        'love u too gang 🤝',
-        'friendship arc unlocked',
-        'bro thinks this is anime'
-      ];
-
-      await message.channel.sendTyping();
-
-      return message.reply(
-        replies[Math.floor(Math.random() * replies.length)]
-      );
-    }
-
-    // SKILL ISSUE
-    if (
-      userMessage.includes('skill issue')
-    ) {
-
-      const replies = [
-        'mental damage +999 😭',
-        'bro got humbled',
-        'that would end friendships ngl',
-        'painful sentence honestly'
-      ];
-
-      await message.channel.sendTyping();
-
-      return message.reply(
-        replies[Math.floor(Math.random() * replies.length)]
-      );
-    }
-
-    // VALO
-    if (
-      userMessage.includes('valo')
-    ) {
-
-      const replies = [
-        'someone is about to lose RR 😭',
-        'who instalocking duelist',
-        'bottom frag incoming 💀',
-        'ranked demon activity',
-        'valo queue = mental warfare'
-      ];
-
-      await message.channel.sendTyping();
-
-      return message.reply(
-        replies[Math.floor(Math.random() * replies.length)]
-      );
-    }
-
-    // R6
-    if (
-      userMessage.includes('r6') ||
-      userMessage.includes('rainbow six')
-    ) {
-
-      const replies = [
-        'swing or be swung 😭',
-        'spawnpeek incident incoming',
-        'intel diff',
-        'bro reinforcing rotates again'
-      ];
-
-      await message.channel.sendTyping();
-
-      return message.reply(
-        replies[Math.floor(Math.random() * replies.length)]
-      );
-    }
-
-    // F1
-    if (
-      userMessage.includes('f1') ||
-      userMessage.includes('formula 1')
-    ) {
-
-      const replies = [
-        'ferrari strategy masterclass 😭',
-        'box box',
-        'verstappen diff',
-        'someone cooked the tyres again'
-      ];
-
-      await message.channel.sendTyping();
-
-      return message.reply(
-        replies[Math.floor(Math.random() * replies.length)]
-      );
-    }
-
-    // MINECRAFT
-    if (
-      userMessage.includes('minecraft')
-    ) {
-
-      const replies = [
-        'creeper incident 💀',
-        'bro lost diamonds again',
-        'minecraft at 3am hits different',
-        'villager activities'
-      ];
-
-      await message.channel.sendTyping();
-
-      return message.reply(
-        replies[Math.floor(Math.random() * replies.length)]
-      );
-    }
-
-    // CS2
-    if (
-      userMessage.includes('cs2') ||
-      userMessage.includes('counter strike')
-    ) {
-
-      const replies = [
-        'rush B 😭',
-        'VAC moment',
-        'bro missed the easiest spray',
-        'eco round demons'
-      ];
-
-      await message.channel.sendTyping();
-
-      return message.reply(
-        replies[Math.floor(Math.random() * replies.length)]
-      );
-    }
-
-    // AMONG US
-    if (
-      userMessage.includes('among us') ||
-      userMessage.includes('sus')
-    ) {
-
-      const replies = [
-        'bro is NOT innocent 💀',
-        'sus behavior detected',
-        'emergency meeting 😭',
-        'venting activities'
-      ];
-
-      await message.channel.sendTyping();
-
-      return message.reply(
-        replies[Math.floor(Math.random() * replies.length)]
-      );
-    }
-
-    // QUESTIONS
-    if (
-      userMessage.includes('?')
-    ) {
-
-      const replies = [
-        'maybe 😭',
-        'probably not',
-        'sounds risky',
-        'absolutely',
-        'nah bro'
-      ];
-
-      await message.channel.sendTyping();
-
-      return message.reply(
-        replies[Math.floor(Math.random() * replies.length)]
-      );
-    }
-
-    // FALLBACK
-    const smartFallbacks = [
-      'bro speaking facts',
-      'that’s actually crazy 😭',
-      'understandable honestly',
-      'bro cooked',
-      'nah that’s wild',
-      'real',
-      'lowkey true',
-      'fair enough 😭'
-    ];
-
-    await message.channel.sendTyping();
-
-    return message.reply(
-      smartFallbacks[
-        Math.floor(Math.random() * smartFallbacks.length)
-      ]
-    );
   }
 
   // ============================================================
-  // RANDOM CHAT
+  // PASSIVE REPLIES
   // ============================================================
 
- // ============================================================
-// PASSIVE CONVERSATION ENGINE V2
+  if (
+    shouldPassiveReply &&
+    !message.mentions.has(client.user)
+  ) {
+
+    if (
+      msg.includes('rr') ||
+      msg.includes('valo') ||
+      msg.includes('ranked')
+    ) {
+
+      const replies = [
+        'ranked was invented by demons 😭',
+        'someone losing mental today',
+        'RR disappearing incident'
+      ];
+
+      lastPassiveReply = now;
+
+      return message.reply(
+        replies[Math.floor(Math.random() * replies.length)]
+      );
+    }
+  }
+
+});
+
+// ============================================================
+// TICKET SYSTEM
 // ============================================================
 
-if (
-  shouldPassiveReply &&
-  !message.mentions.has(client.user)
-) {
+client.on('interactionCreate', async (interaction) => {
 
-  // VALO / RR
-  if (
-    msg.includes('rr') ||
-    msg.includes('valo') ||
-    msg.includes('ranked')
-  ) {
+  if (!interaction.isButton()) return;
 
-    const replies = [
-      'ranked was invented by demons 😭',
-      'someone losing mental today',
-      'RR disappearing incident',
-      'bottom frag incoming 💀',
-      'queueing valo is self harm ngl'
-    ];
+  // CREATE TICKET
 
-    lastPassiveReply = now;
+  if (interaction.customId === 'create_ticket') {
 
-    await message.channel.sendTyping();
-
-    return message.reply(
-      replies[Math.floor(Math.random() * replies.length)]
+    const existingTicket = interaction.guild.channels.cache.find(
+      c =>
+        c.name ===
+        `ticket-${interaction.user.username.toLowerCase()}`
     );
-  }
 
-  // SKILL ISSUE
-  if (
-    msg.includes('skill issue')
-  ) {
+    if (existingTicket) {
 
-    const replies = [
-      'emotional damage 😭',
-      'that sentence ruins friendships',
-      'bro got humbled instantly',
-      'recovery not possible after that'
-    ];
+      return interaction.reply({
+        content: `❌ You already have an open ticket: ${existingTicket}`,
+        ephemeral: true
+      });
+    }
 
-    lastPassiveReply = now;
-
-    await message.channel.sendTyping();
-
-    return message.reply(
-      replies[Math.floor(Math.random() * replies.length)]
+    const supportRole = interaction.guild.roles.cache.find(
+      r => r.name === 'Support'
     );
+
+    const channel = await interaction.guild.channels.create({
+
+      name: `ticket-${interaction.user.username}`,
+
+      type: ChannelType.GuildText,
+
+      permissionOverwrites: [
+
+        {
+          id: interaction.guild.id,
+          deny: [
+            PermissionsBitField.Flags.ViewChannel
+          ]
+        },
+
+        {
+          id: interaction.user.id,
+          allow: [
+            PermissionsBitField.Flags.ViewChannel,
+            PermissionsBitField.Flags.SendMessages,
+            PermissionsBitField.Flags.ReadMessageHistory
+          ]
+        },
+
+        ...(supportRole ? [{
+          id: supportRole.id,
+          allow: [
+            PermissionsBitField.Flags.ViewChannel,
+            PermissionsBitField.Flags.SendMessages,
+            PermissionsBitField.Flags.ReadMessageHistory
+          ]
+        }] : [])
+
+      ]
+
+    });
+
+    const row = new ActionRowBuilder()
+      .addComponents(
+
+        new ButtonBuilder()
+          .setCustomId('close_ticket')
+          .setLabel('Close Ticket')
+          .setEmoji('🔒')
+          .setStyle(ButtonStyle.Danger)
+
+      );
+
+    const embed = new EmbedBuilder()
+      .setTitle('🎫 Ticket Created')
+      .setDescription(
+        `Welcome ${interaction.user}!\n\n` +
+        `Please explain your issue.\n` +
+        `Support will assist you shortly.`
+      )
+      .setColor(0x5865F2);
+
+    await channel.send({
+
+      content: `${interaction.user}`,
+
+      embeds: [embed],
+
+      components: [row]
+
+    });
+
+    await interaction.reply({
+
+      content: `✅ Ticket created: ${channel}`,
+
+      ephemeral: true
+
+    });
   }
 
-  // GG / NT
-  if (
-    msg.includes('gg') ||
-    msg.includes('nt')
-  ) {
+  // CLOSE TICKET
 
-    const replies = [
-      'it was NOT nt 😭',
-      'respectfully that was tragic',
-      'gg go next',
-      'pain.'
-    ];
+  if (interaction.customId === 'close_ticket') {
 
-    lastPassiveReply = now;
+    await interaction.reply({
 
-    await message.channel.sendTyping();
+      content: '🔒 Closing ticket in 5 seconds...'
 
-    return message.reply(
-      replies[Math.floor(Math.random() * replies.length)]
-    );
+    });
+
+    setTimeout(async () => {
+
+      try {
+
+        await interaction.channel.delete();
+
+      } catch (err) {
+
+        console.log(err);
+
+      }
+
+    }, 5000);
   }
-
-  // QUEUE
-  if (
-    msg.includes('who queue') ||
-    msg.includes('queue?') ||
-    msg.includes('valo anyone')
-  ) {
-
-    const replies = [
-      'someone about to lose RR 😭',
-      'friendship ending session starting',
-      'ranked demons assembling',
-      'mental health leaving the server'
-    ];
-
-    lastPassiveReply = now;
-
-    await message.channel.sendTyping();
-
-    return message.reply(
-      replies[Math.floor(Math.random() * replies.length)]
-    );
-  }
-
-  // BORED
-  if (
-    msg.includes('bored')
-  ) {
-
-    const replies = [
-      'same honestly 😭',
-      'peak boredom activities',
-      'someone start a game',
-      'server dead af'
-    ];
-
-    lastPassiveReply = now;
-
-    await message.channel.sendTyping();
-
-    return message.reply(
-      replies[Math.floor(Math.random() * replies.length)]
-    );
-  }
-
-  // SUS
-  if (
-    msg.includes('sus')
-  ) {
-
-    const replies = [
-      'bro is NOT innocent 💀',
-      'venting activities detected',
-      'emergency meeting 😭',
-      'highly suspicious behavior'
-    ];
-
-    lastPassiveReply = now;
-
-    await message.channel.sendTyping();
-
- return message.reply(
-  replies[Math.floor(Math.random() * replies.length)]
-);
-  }
-}
 
 });
 
